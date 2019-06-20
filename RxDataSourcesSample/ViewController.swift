@@ -32,7 +32,7 @@ private extension Message {
 
 class ViewController: UIViewController {
 
-  let dataSource = RxTableViewSectionedReloadDataSource<SectionModel<String, Message>>(configureCell: { dataSource, table, indexPath, message in
+  let dataSource = RxTableViewSectionedAnimatedDataSource<AnimatableSectionModel<String, Message>>(configureCell: { dataSource, table, indexPath, message in
     guard let cell = table.dequeueReusableCell(withIdentifier: message.identifier.rawValue) else { return UITableViewCell() }
     switch message {
     case let .text(message):
@@ -46,33 +46,81 @@ class ViewController: UIViewController {
     }
   })
 
-  private var messages = Observable<[SectionModel<String, Message>]>.just([
-    SectionModel<String, Message>(model: "1",
-                                  items: [
-                                    .attributedText(NSAttributedString(string: "Blue text",
-                                                                       attributes: [NSAttributedString.Key.foregroundColor : UIColor.blue])),
-                                    .text("On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment"),
-                                    .photo(UIImage(named: "rx-wide")!),
-                                    .attributedText(NSAttributedString(string: "Red text",
-                                                                       attributes: [NSAttributedString.Key.foregroundColor : UIColor.red]))
-      ]),
-    SectionModel<String, Message>(model: "2",
-                                  items: [
-                                    .text("Another Message"),
-                                    .location(lat: 37.334722, lon: -122.008889),
-                                    .text("Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"),
-                                    .photo(UIImage(named: "rx-logo")!)
-      ]),
-    SectionModel<String, Message>(model: "3",
-                                  items: [
-                                    .attributedText(NSAttributedString(string: "Green text",
-                                                                       attributes: [NSAttributedString.Key.foregroundColor : UIColor.green])),
-                                    .location(lat: 53.9, lon: 27.56667),
-                                    .text("There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text."),
-                                    .attributedText(NSAttributedString(string: "Yellow text",
-                                                                       attributes: [NSAttributedString.Key.foregroundColor : UIColor.yellow]))
-      ])
-    ])
+  private var messages = Observable<Int>
+    .interval(3, scheduler: MainScheduler.instance)
+    .map { num -> [AnimatableSectionModel<String, Message>] in
+      switch num {
+      case 0:
+        return [
+          AnimatableSectionModel<String, Message>(model: "1",
+                                                  items: [
+                                                    .text("On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment"),
+            ]),
+          AnimatableSectionModel<String, Message>(model: "2",
+                                                  items: [
+                                                    .text("Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"),
+            ]),
+          AnimatableSectionModel<String, Message>(model: "3",
+                                                  items: [
+                                                    .text("There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text."),
+            ])
+        ]
+      case 1, 3:
+        return [
+          AnimatableSectionModel<String, Message>(model: "1",
+                                                  items: [
+                                                    .attributedText(NSAttributedString(string: "Blue text",
+                                                                                       attributes: [NSAttributedString.Key.foregroundColor : UIColor.blue])),
+                                                    .text("On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment"),
+                                                    .photo(UIImage(named: "rx-wide")!),
+                                                    .attributedText(NSAttributedString(string: "Red text",
+                                                                                       attributes: [NSAttributedString.Key.foregroundColor : UIColor.red]))
+            ]),
+          AnimatableSectionModel<String, Message>(model: "2",
+                                                  items: [
+                                                    .text("Another Message"),
+                                                    .location(lat: 37.334722, lon: -122.008889),
+                                                    .text("Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s"),
+                                                    .photo(UIImage(named: "rx-logo")!)
+            ]),
+          AnimatableSectionModel<String, Message>(model: "3",
+                                                  items: [
+                                                    .attributedText(NSAttributedString(string: "Green text",
+                                                                                       attributes: [NSAttributedString.Key.foregroundColor : UIColor.green])),
+                                                    .location(lat: 53.9, lon: 27.56667),
+                                                    .text("There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised words which don't look even slightly believable. If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text."),
+                                                    .attributedText(NSAttributedString(string: "Yellow text",
+                                                                                       attributes: [NSAttributedString.Key.foregroundColor : UIColor.yellow]))
+            ])
+        ]
+      default:
+        return [
+          AnimatableSectionModel<String, Message>(model: "1",
+                                                  items: [
+                                                    .attributedText(NSAttributedString(string: "Blue text",
+                                                                                       attributes: [NSAttributedString.Key.foregroundColor : UIColor.blue])),
+                                                    .photo(UIImage(named: "rx-wide")!),
+                                                    .attributedText(NSAttributedString(string: "Red text",
+                                                                                       attributes: [NSAttributedString.Key.foregroundColor : UIColor.red]))
+            ]),
+          AnimatableSectionModel<String, Message>(model: "2",
+                                                  items: [
+                                                    .text("Another Message"),
+                                                    .location(lat: 37.334722, lon: -122.008889),
+                                                    .photo(UIImage(named: "rx-logo")!)
+            ]),
+          AnimatableSectionModel<String, Message>(model: "3",
+                                                  items: [
+                                                    .attributedText(NSAttributedString(string: "Green text",
+                                                                                       attributes: [NSAttributedString.Key.foregroundColor : UIColor.green])),
+                                                    .location(lat: 53.9, lon: 27.56667),
+                                                    .attributedText(NSAttributedString(string: "Yellow text",
+                                                                                       attributes: [NSAttributedString.Key.foregroundColor : UIColor.yellow]))
+            ])
+        ]
+      }
+    }
+    .take(4)
 
   private let disposeBag = DisposeBag()
 
