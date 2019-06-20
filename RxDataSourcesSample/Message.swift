@@ -9,6 +9,21 @@
 import UIKit
 import Differentiator
 
+class MessageObject: NSObject {
+  let message: Message
+  let messageId: String
+
+  init(message: Message, messageId: String) {
+    self.message = message
+    self.messageId = messageId
+  }
+
+  override func isEqual(_ object: Any?) -> Bool {
+    guard let obj = object as? MessageObject else { return false }
+    return messageId == obj.messageId
+  }
+}
+
 enum Message {
   case text(String)
   case attributedText(NSAttributedString)
@@ -16,20 +31,8 @@ enum Message {
   case location(lat: Double, lon: Double)
 }
 
-extension Message: IdentifiableType {
+extension MessageObject: IdentifiableType {
   var identity : String {
-    switch self {
-    case let .text(text):
-      return "text_\(text)"
-    case let .attributedText(text):
-      return "attributed_\(text)"
-    case let .location(lat: lat, lon: lon):
-      return "\(lat)_\(lon)"
-    case let .photo(image):
-      guard let data = image.pngData() else { return "image" }
-      return String(data.hashValue)
-    }
+    return messageId
   }
 }
-
-extension Message: Equatable {}
